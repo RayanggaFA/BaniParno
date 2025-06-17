@@ -26,6 +26,7 @@ class Member extends Model
         'photo',
         'family_id',
         'parent_id',
+        'generation_id', // UBAH DARI 'generation' KE 'generation_id'
         'gender',
         'status',
         'notes',
@@ -61,6 +62,11 @@ class Member extends Model
         return $this->hasMany(MemberHistory::class);
     }
 
+    public function generation()
+    {
+        return $this->belongsTo(Generation::class);
+    }
+
     // Accessors
     public function age(): Attribute
     {
@@ -91,8 +97,8 @@ class Member extends Model
 
     public function scopeByGeneration($query, $generation)
     {
-        return $query->whereHas('family', function ($q) use ($generation) {
-            $q->where('generation', $generation);
+        return $query->whereHas('generation', function ($q) use ($generation) {
+            $q->where('name', $generation);
         });
     }
 

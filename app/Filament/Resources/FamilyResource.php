@@ -1,15 +1,16 @@
 <?php
-// app/Filament/Resources/FamilyResource.php
 
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FamilyResource\Pages;
+use App\Filament\Resources\FamilyResource\RelationManagers;
 use App\Models\Family;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Support\Enums\FontWeight;
 
 class FamilyResource extends Resource
 {
@@ -23,36 +24,27 @@ class FamilyResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->label('Nama Keluarga')
-                    ->required()
-                    ->maxLength(255),
-                
-                Forms\Components\TextInput::make('branch')
-                    ->label('Cabang Keluarga')
-                    ->required()
-                    ->maxLength(255)
-                    ->placeholder('Contoh: Parno 1, Parno 2'),
-                
-                Forms\Components\Select::make('generation')
-                    ->label('Generasi')
-                    ->options([
-                        1 => 'Generasi Pertama',
-                        2 => 'Generasi Kedua',
-                        3 => 'Generasi Ketiga',
-                        4 => 'Generasi Keempat',
-                        5 => 'Generasi Kelima',
+                Forms\Components\Section::make('Informasi Keluarga')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nama Keluarga')
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder('Contoh: Keluarga Budi Santoso'),
+                        
+                        Forms\Components\TextInput::make('branch')
+                            ->label('Cabang')
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder('Contoh: Cabang Jakarta, Cabang Surabaya'),
+                        
+                        Forms\Components\Textarea::make('description')
+                            ->label('Deskripsi')
+                            ->rows(3)
+                            ->placeholder('Deskripsi tentang keluarga ini...')
+                            ->columnSpanFull(),
                     ])
-                    ->required(),
-                
-                Forms\Components\ColorPicker::make('color')
-                    ->label('Warna Identitas')
-                    ->default('#3B82F6'),
-                
-                Forms\Components\Textarea::make('description')
-                    ->label('Deskripsi')
-                    ->rows(3)
-                    ->columnSpanFull(),
+                    ->columns(2),
             ]);
     }
 
@@ -63,51 +55,47 @@ class FamilyResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Keluarga')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight(FontWeight::SemiBold),
                 
                 Tables\Columns\TextColumn::make('branch')
                     ->label('Cabang')
                     ->searchable()
-                    ->sortable(),
-                
-                Tables\Columns\TextColumn::make('generation')
-                    ->label('Generasi')
+                    ->sortable()
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        '1' => 'success',
-                        '2' => 'info',
-                        '3' => 'warning',
-                        '4' => 'danger',
-                        default => 'gray',
-                    })
-                    ->sortable(),
+                    ->color('primary'),
                 
                 Tables\Columns\TextColumn::make('members_count')
                     ->label('Jumlah Anggota')
                     ->counts('members')
+                    ->badge()
+                    ->color('success')
+                    ->suffix(' orang')
                     ->sortable(),
-                
-                Tables\Columns\ColorColumn::make('color')
-                    ->label('Warna'),
                 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Diperbarui')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('generation')
-                    ->label('Generasi')
-                    ->options([
-                        1 => 'Generasi Pertama',
-                        2 => 'Generasi Kedua',
-                        3 => 'Generasi Ketiga',
-                        4 => 'Generasi Keempat',
-                        5 => 'Generasi Kelima',
-                    ]),
+                Tables\Filters\Filter::make('has_members')
+                    ->label('Memiliki Anggota')
+                    ->query(fn ($query) => $query->has('members')),
+                
+                Tables\Filters\Filter::make('no_members')
+                    ->label('Tidak Ada Anggota')
+                    ->query(fn ($query) => $query->doesntHave('members')),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -115,7 +103,15 @@ class FamilyResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('name');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\MembersRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
@@ -123,6 +119,7 @@ class FamilyResource extends Resource
         return [
             'index' => Pages\ListFamilies::route('/'),
             'create' => Pages\CreateFamily::route('/create'),
+            'view' => Pages\ViewFamily::route('/{record}'),
             'edit' => Pages\EditFamily::route('/{record}/edit'),
         ];
     }

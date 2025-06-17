@@ -1,5 +1,4 @@
 <?php
-// app/Models/Family.php
 
 namespace App\Models;
 
@@ -12,19 +11,32 @@ class Family extends Model
 
     protected $fillable = [
         'name',
-        'branch',
-        'generation',
+        'branch', // Cabang keluarga
         'description',
-        'color',
+        // HAPUS 'generation' dari sini
     ];
 
+    // Relationships
     public function members()
     {
         return $this->hasMany(Member::class);
     }
 
-    public function activemembers()
+    // Accessor untuk jumlah anggota
+    public function getMembersCountAttribute()
     {
-        return $this->hasMany(Member::class)->where('status', 'active');
+        return $this->members()->count();
+    }
+
+    // Scopes
+    public function scopeByBranch($query, $branch)
+    {
+        return $query->where('branch', 'like', '%' . $branch . '%');
+    }
+
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('branch', 'like', '%' . $search . '%');
     }
 }

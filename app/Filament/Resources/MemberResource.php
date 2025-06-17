@@ -7,6 +7,7 @@ use App\Filament\Resources\MemberResource\Pages;
 use App\Filament\Resources\MemberResource\RelationManagers;
 use App\Models\Member;
 use App\Models\Family;
+use App\Models\Generation; // Tambahkan ini
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -36,6 +37,14 @@ class MemberResource extends Resource
                         Forms\Components\Select::make('family_id')
                             ->label('Keluarga')
                             ->relationship('family', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        
+                        // TAMBAHKAN FIELD GENERATION INI
+                        Forms\Components\Select::make('generation_id')
+                            ->label('Generasi')
+                            ->relationship('generation', 'name')
                             ->required()
                             ->searchable()
                             ->preload(),
@@ -163,16 +172,12 @@ class MemberResource extends Resource
                     ->searchable()
                     ->sortable(),
                 
-                Tables\Columns\TextColumn::make('family.generation')
-                    ->label('Gen')
+                // UPDATE KOLOM GENERATION
+                Tables\Columns\TextColumn::make('generation.name')
+                    ->label('Generasi')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        '1' => 'success',
-                        '2' => 'info',
-                        '3' => 'warning',
-                        '4' => 'danger',
-                        default => 'gray',
-                    }),
+                    ->searchable()
+                    ->sortable(),
                 
                 Tables\Columns\TextColumn::make('age')
                     ->label('Umur')
@@ -212,6 +217,11 @@ class MemberResource extends Resource
                 Tables\Filters\SelectFilter::make('family')
                     ->label('Keluarga')
                     ->relationship('family', 'name'),
+                
+                // TAMBAHKAN FILTER GENERATION
+                Tables\Filters\SelectFilter::make('generation')
+                    ->label('Generasi')
+                    ->relationship('generation', 'name'),
                 
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Status')
