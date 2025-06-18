@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FamilyController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\SocialLinkController;
+use App\Http\Controllers\HomeController; 
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +17,7 @@ use App\Http\Controllers\SocialLinkController;
 Route::get('/', function () {
     return view('welcome');
 });
-
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/family', [FamilyController::class, 'index']);
 Route::get('/families/{id}/edit', [FamilyController::class, 'edit'])->name('families.edit');
 Route::put('/families/{family}', [FamilyController::class, 'update'])->name('families.update');
