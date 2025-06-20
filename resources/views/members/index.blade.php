@@ -9,6 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-50">
+
     <!-- Navigation -->
     <nav class="bg-blue-600 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -106,24 +107,12 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Anggota
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Keluarga
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Informasi
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Kontak
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Status
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Aksi
-                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Anggota</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keluarga</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Informasi</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kontak</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="membersTableBody" class="bg-white divide-y divide-gray-200">
@@ -166,22 +155,15 @@
                                 </div>
                                 <div class="text-sm text-gray-500">{{ $member->age }} tahun</div>
                                 <div class="text-sm text-gray-500">
-                                    <i class="fas fa-map-marker-alt mr-1"></i>
-                                    {{ $member->domicile_city }}
+                                    <i class="fas fa-map-marker-alt mr-1"></i> {{ $member->domicile_city }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($member->phone)
-                                <div class="text-sm text-gray-900">
-                                    <i class="fas fa-phone mr-1"></i>
-                                    {{ $member->phone }}
-                                </div>
+                                <div class="text-sm text-gray-900"><i class="fas fa-phone mr-1"></i> {{ $member->phone }}</div>
                                 @endif
                                 @if($member->email)
-                                <div class="text-sm text-gray-500">
-                                    <i class="fas fa-envelope mr-1"></i>
-                                    {{ $member->email }}
-                                </div>
+                                <div class="text-sm text-gray-500"><i class="fas fa-envelope mr-1"></i> {{ $member->email }}</div>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -200,9 +182,13 @@
                                     <a href="{{ route('members.edit', $member) }}" class="text-green-600 hover:text-green-900">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button onclick="deleteMember({{ $member->id }})" class="text-red-600 hover:text-red-900">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    <form action="{{ route('members.destroy', $member) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -218,36 +204,44 @@
         </div>
     </div>
 
+    <!-- JS: Filter Logic -->
     <script>
-        // Search and Filter functionality
-        document.getElementById('searchInput').addEventListener('input', filterMembers);
-        document.getElementById('familyFilter').addEventListener('change', filterMembers);
-        document.getElementById('statusFilter').addEventListener('change', filterMembers);
-        document.getElementById('genderFilter').addEventListener('change', filterMembers);
+        const searchInput = document.getElementById('searchInput');
+        const familyFilter = document.getElementById('familyFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const genderFilter = document.getElementById('genderFilter');
+        const memberRows = document.querySelectorAll('.member-row');
 
         function filterMembers() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const familyFilter = document.getElementById('familyFilter').value;
-    const statusFilter = document.getElementById('statusFilter').value;
-    const genderFilter = document.getElementById('genderFilter').value;
-    
-    const memberRows = document.querySelectorAll('.member-row');
-    
-    memberRows.forEach(row => {
-        const name = row.dataset.name;
-        const family = row.dataset.family;
-        const status = row.dataset.status;
-        const gender = row.dataset.gender;
-        
-        const matchesSearch = name.includes(searchTerm);
-        const matchesFamily = !familyFilter || family === familyFilter;
-        const matchesStatus = !statusFilter || status === statusFilter;
-        const matchesGender = !genderFilter || gender === genderFilter;
-        
-        if (matchesSearch && matchesFamily && matchesStatus && matchesGender) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
+            const search = searchInput.value.toLowerCase();
+            const family = familyFilter.value;
+            const status = statusFilter.value;
+            const gender = genderFilter.value;
+
+            memberRows.forEach(row => {
+                const nameJob = row.dataset.name;
+                const fam = row.dataset.family;
+                const stat = row.dataset.status;
+                const gen = row.dataset.gender;
+
+                const matchSearch = nameJob.includes(search);
+                const matchFamily = family === "" || fam === family;
+                const matchStatus = status === "" || stat === status;
+                const matchGender = gender === "" || gen === gender;
+
+                if (matchSearch && matchFamily && matchStatus && matchGender) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         }
-    });
-}
+
+        searchInput.addEventListener('input', filterMembers);
+        familyFilter.addEventListener('change', filterMembers);
+        statusFilter.addEventListener('change', filterMembers);
+        genderFilter.addEventListener('change', filterMembers);
+    </script>
+
+</body>
+</html>
