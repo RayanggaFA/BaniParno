@@ -39,6 +39,24 @@
             </ol>
         </nav>
 
+        <!-- Success Message -->
+        @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+        @endif
+
+        <!-- Error Messages -->
+        @if($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+            <ul class="list-disc list-inside">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <!-- Family Header -->
         <div class="bg-white shadow rounded-lg mb-6">
             <div class="px-4 py-5 sm:p-6">
@@ -78,13 +96,6 @@
                 @endif
             </div>
         </div>
-
-        <!-- Success Message -->
-        @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
-            <span class="block sm:inline">{{ session('success') }}</span>
-        </div>
-        @endif
 
         <!-- Search and Filter -->
         <div class="bg-white shadow rounded-lg mb-6">
@@ -219,26 +230,29 @@
                     <div class="px-6 py-4 space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nama Keluarga</label>
-                            <input type="text" name="name" id="editFamilyName" value="{{ $family->name }}" required
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" name="name" id="editFamilyName" value="{{ old('name', $family->name) }}" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 @error('name') border-red-500 @enderror">
+                            @error('name')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Cabang</label>
-                            <input type="text" name="branch" id="editFamilyBranch" value="{{ $family->branch }}" required
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Warna Identitas</label>
-                            <input type="color" name="color" id="editFamilyColor" value="{{ $family->color }}"
-                                   class="w-full h-10 border border-gray-300 rounded-md">
+                            <input type="text" name="branch" id="editFamilyBranch" value="{{ old('branch', $family->branch) }}" required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 @error('branch') border-red-500 @enderror">
+                            @error('branch')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
                             <textarea name="description" id="editFamilyDescription" rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">{{ $family->description }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 @error('description') border-red-500 @enderror">{{ old('description', $family->description) }}</textarea>
+                            @error('description')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                     
@@ -247,7 +261,8 @@
                             Batal
                         </button>
                         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            Simpan
+                            <i class="fas fa-save mr-1"></i>
+                            Simpan Perubahan
                         </button>
                     </div>
                 </form>
@@ -316,6 +331,11 @@
                 closeEditModal();
             }
         });
+
+        // Auto-open modal if there are validation errors
+        @if($errors->any())
+            document.getElementById('editFamilyModal').classList.remove('hidden');
+        @endif
     </script>
 </body>
 </html>

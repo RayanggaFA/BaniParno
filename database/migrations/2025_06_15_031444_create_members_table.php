@@ -15,10 +15,10 @@ return new class extends Migration
             $table->string('birth_place');
             $table->date('birth_date');
             $table->string('job');
-            $table->text('address_ktp'); // Alamat KTP
+            $table->text('address_ktp'); 
             $table->string('domicile_city');
             $table->string('domicile_province');
-            $table->text('current_address'); // Alamat domisili
+            $table->text('current_address');
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
             $table->string('photo')->nullable();

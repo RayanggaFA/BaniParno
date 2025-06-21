@@ -12,10 +12,10 @@ class FamilyController extends Controller
      * Display a listing of families
      */
     public function index()
-{
-    $families = Family::paginate(10); // Ganti all() dengan paginate()
-    return view('families.index', compact('families'));
-}
+    {
+        $families = Family::paginate(10);
+        return view('families.index', compact('families'));
+    }
 
     /**
      * Show the form for creating a new family
@@ -33,10 +33,9 @@ class FamilyController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'branch' => 'required|string|max:255',
-            'generation' => 'required|integer|min:1',
             'description' => 'nullable|string',
             'color' => 'nullable|string|max:7',
-            'status' => 'nullable|in:active,inactive'
+            'generation' => 'nullable|integer|min:1'
         ]);
 
         Family::create($request->all());
@@ -49,35 +48,28 @@ class FamilyController extends Controller
      * Display the specified family
      */
     public function show(Family $family)
-{
-    $family->load(['members' => function ($query) {
-        $query->with(['socialLinks', 'children'])
-              ->orderBy('birth_date');
-    }]);
-    
-    // Untuk pagination, ambil members secara terpisah dengan paginate()
-    $members = Member::where('family_id', $family->id)
-                    ->with(['socialLinks', 'children'])
-                    ->orderBy('birth_date')
-                    ->paginate(15); // Ini menghasilkan Paginator
-    
-    return view('families.show', compact('family', 'members'));
-}
+    {
+        $family->load(['members' => function ($query) {
+            $query->with(['socialLinks', 'children'])
+                  ->orderBy('birth_date');
+        }]);
+        
+        // Untuk pagination, ambil members secara terpisah dengan paginate()
+        $members = Member::where('family_id', $family->id)
+                        ->with(['socialLinks', 'children'])
+                        ->orderBy('birth_date')
+                        ->paginate(15);
+        
+        return view('families.show', compact('family', 'members'));
+    }
 
     /**
      * Show the form for editing the specified family
      */
-    public function edit($id)
-{
-    $family = Family::find($id);
-
-    if (!$family) {
-        return redirect()->route('families.index')->with('error', 'Gagal memuat data keluarga');
+    public function edit(Family $family)
+    {
+        return view('families.edit', compact('family'));
     }
-
-    return view('families.edit', compact('family'));
-}
-
 
     /**
      * Update the specified family
@@ -87,10 +79,9 @@ class FamilyController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'branch' => 'required|string|max:255',
-            'generation' => 'required|integer|min:1',
             'description' => 'nullable|string',
             'color' => 'nullable|string|max:7',
-            'status' => 'nullable|in:active,inactive'
+            'generation' => 'nullable|integer|min:1'
         ]);
 
         $family->update($request->all());

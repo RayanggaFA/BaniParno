@@ -11,15 +11,31 @@ class Family extends Model
 
     protected $fillable = [
         'name',
-        'branch', // Cabang keluarga
+        'branch', 
         'description',
-        // HAPUS 'generation' dari sini
+        'color',
+        'generation'
+    ];
+
+    protected $attributes = [
+        'color' => '#3B82F6',
+        'generation' => 1
     ];
 
     // Relationships
     public function members()
     {
         return $this->hasMany(Member::class);
+    }
+
+    public function activeMembers()
+    {
+        return $this->hasMany(Member::class)->where('status', 'active');
+    }
+
+    public function rootMembers()
+    {
+        return $this->hasMany(Member::class)->whereNull('parent_id');
     }
 
     // Accessor untuk jumlah anggota

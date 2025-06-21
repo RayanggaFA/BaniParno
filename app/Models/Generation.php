@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Generation extends Model
 {
@@ -11,19 +11,30 @@ class Generation extends Model
 
     protected $fillable = [
         'name',
+        'branch',
         'description',
-        'order',
+        'color',
+        'status'
     ];
 
-    // Relationship dengan Member
+    // Atau bisa menggunakan default value untuk generation
+    protected $attributes = [
+        'generation' => 1, // Default value
+        'status' => 'active'
+    ];
+
     public function members()
     {
         return $this->hasMany(Member::class);
     }
 
-    // Scope untuk ordering
-    public function scopeOrdered($query)
+    public function activeMembers()
     {
-        return $query->orderBy('order');
+        return $this->hasMany(Member::class)->where('status', 'active');
+    }
+
+    public function rootMembers()
+    {
+        return $this->hasMany(Member::class)->whereNull('parent_id');
     }
 }
