@@ -26,7 +26,7 @@ class Member extends Model
         'photo',
         'family_id',
         'parent_id',
-        'generation_id', // UBAH DARI 'generation' KE 'generation_id'
+        'generation_id', 
         'gender',
         'status',
         'notes',
@@ -83,11 +83,12 @@ class Member extends Model
     }
 
     public function photoUrl(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->photo ? asset('storage/' . $this->photo) : asset('images/default-avatar.png'),
-        );
-    }
+{
+    return Attribute::make(
+        get: fn () => $this->photo ? asset('storage/' . $this->photo) : asset('images/default-avatar.png'),
+
+    );
+}
 
     // Scopes
     public function scopeActive($query)

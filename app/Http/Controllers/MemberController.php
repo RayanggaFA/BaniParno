@@ -75,6 +75,7 @@ class MemberController extends Controller
         ]);
 
         $member = Member::create($request->all());
+        $photo->storeAs('photos', $filename, 'public');
 
         MemberHistory::create([
             'member_id' => $member->id,

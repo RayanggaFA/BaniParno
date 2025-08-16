@@ -59,7 +59,7 @@
                         <div class="mb-6">
                             <div class="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-white shadow-lg">
                                 @if($member->photo)
-                                <img src="{{ asset('storage/' . $member->photo) }}" alt="{{ $member->name }}" 
+                                <img src="{{ asset('storage/' . $member->photo_url) }}" alt="{{ $member->name }}" 
                                      class="w-full h-full object-cover">
                                 @else
                                 <div class="w-full h-full bg-white bg-opacity-20 flex items-center justify-center">
