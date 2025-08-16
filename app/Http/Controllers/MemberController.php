@@ -55,39 +55,51 @@ class MemberController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'birth_place' => 'required|string|max:255',
-            'birth_date' => 'required|date',
-            'job' => 'required|string|max:255',
-            'address_ktp' => 'required|string',
-            'domicile_city' => 'required|string|max:255',
-            'domicile_province' => 'required|string|max:255',
-            'current_address' => 'required|string',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'family_id' => 'required|exists:families,id',
-            'parent_id' => 'nullable|exists:members,id',
-            'gender' => 'required|in:male,female',
-            'status' => 'required|in:active,inactive,deceased',
-            'notes' => 'nullable|string'
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'birth_place' => 'required|string|max:255',
+        'birth_date' => 'required|date',
+        'job' => 'required|string|max:255',
+        'address_ktp' => 'required|string',
+        'domicile_city' => 'required|string|max:255',
+        'domicile_province' => 'required|string|max:255',
+        'current_address' => 'required|string',
+        'phone' => 'nullable|string|max:20',
+        'email' => 'nullable|email|max:255',
+        'family_id' => 'required|exists:families,id',
+        'parent_id' => 'nullable|exists:members,id',
+        'gender' => 'required|in:male,female',
+        'status' => 'required|in:active,inactive,deceased',
+        'notes' => 'nullable|string',
+        'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // Tambahkan validasi photo
+    ]);
 
-        $member = Member::create($request->all());
+    // Handle photo upload
+    $filename = null;
+    if ($request->hasFile('photo')) {
+        $photo = $request->file('photo');
+        $filename = time() . '_' . $photo->getClientOriginalName();
         $photo->storeAs('photos', $filename, 'public');
-
-        MemberHistory::create([
-            'member_id' => $member->id,
-            'field_changed' => 'created',
-            'old_value' => null,
-            'new_value' => 'Member created',
-            'changed_by' => $request->get('changed_by', 'System'),
-            'reason' => 'New member registration'
-        ]);
-
-        return redirect()->route('members.index')->with('success', 'Anggota berhasil ditambahkan!');
     }
+
+    // Buat array data untuk create member
+    $memberData = $request->all();
+    $memberData['photo'] = $filename; // Set photo filename
+
+    $member = Member::create($memberData);
+
+    MemberHistory::create([
+        'member_id' => $member->id,
+        'field_changed' => 'created',
+        'old_value' => null,
+        'new_value' => 'Member created',
+        'changed_by' => $request->get('changed_by', 'System'),
+        'reason' => 'New member registration'
+    ]);
+
+    return redirect()->route('members.index')->with('success', 'Anggota berhasil ditambahkan!');
+}
 
     public function show(Member $member)
     {

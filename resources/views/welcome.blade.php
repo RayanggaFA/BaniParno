@@ -111,18 +111,9 @@
     <section class="py-20 section-bg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-white mb-4">Cabang Keluarga</h2>
-                <p class="text-blue-100 text-lg max-w-2xl mx-auto">
-                    Temukan berbagai cabang keluarga dan jelajahi sejarah serta anggota dari setiap generasi
-                </p>
+                <h2 class="text-4xl font-bold text-white mb-4">Bani Parno</h2>
             </div>
 
-            <!-- Quick Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                <div class="text-center bg-white bg-opacity-10 backdrop-blur-lg rounded-xl p-8 card-hover">
-                    <div class="text-4xl font-bold text-white mb-2">{{ $totalFamilies ?? 0 }}</div>
-                    <div class="text-blue-100">Cabang Keluarga</div>
-                </div>
                 <div class="text-center bg-white bg-opacity-10 backdrop-blur-lg rounded-xl p-8 card-hover">
                     <div class="text-4xl font-bold text-white mb-2">{{ $totalMembers ?? 0 }}</div>
                     <div class="text-blue-100">Total Anggota</div>

@@ -22,7 +22,7 @@ class HomeController extends Controller
         // Hitung statistik untuk dashboard
         $totalFamilies = $families->count();
         $totalMembers = Member::count();
-        $totalGenerations = 5; // Atau bisa diambil dari database jika ada tabel generations
+        $totalGenerations = 4; // Atau bisa diambil dari database jika ada tabel generations
 
         return view('welcome', compact('families', 'totalFamilies', 'totalMembers', 'totalGenerations'));
     }
